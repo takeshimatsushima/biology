@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Chosen Palette: Natural Harmony -->
+    <!-- Application Structure Plan: The application is restructured into five thematic chapters to align with the user-provided 5-hour lesson plan. This pedagogical structure enhances usability for both teachers and students by creating a clear, step-by-step learning path. Key interactions are retained and new ones added: 1. Vegetation classification via interactive cards. 2. A new interactive chart comparing photosynthesis in sun/shade plants. 3. The animated succession diagram and Izu Oshima data chart. 4. The interactive world biome explorer. 5. Diagrams of Japanese biomes. This flow logically builds from foundational concepts to complex systems, making the information more digestible. -->
+    <!-- Visualization & Content Choices: 
+        - Goal: Inform -> Vegetation Classification (Interactive Cards). Justification: Simple, engaging way to introduce basic types.
+        - Goal: Compare/Analyze -> Photosynthesis Curve Chart (NEW - Chart.js Line Chart). Justification: Directly visualizes the core concept of plant adaptation to light, a key topic from the source material.
+        - Goal: Organize/Inform -> Succession Process Diagram (HTML/CSS/JS). Justification: Clearly illustrates the multi-stage process of succession.
+        - Goal: Analyze/Compare -> Izu Oshima Data Chart (Chart.js Line Chart). Justification: Provides a real-world data exploration case for understanding the environmental factors in succession.
+        - Goal: Explore/Compare -> World Biome Chart (Chart.js Scatter). Justification: Allows exploration of the relationship between climate and biome distribution.
+        - Goal: Inform -> Japanese Biome Diagrams (HTML/CSS). Justification: Simple visuals for understanding local biome distribution.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <title>5分で予習☆生物基礎</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #F8F7F4;
+            color: #3A3A3A;
+            scroll-padding-top: 60px; /* Offset for sticky nav */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 50vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+        }
+        .nav-link.active {
+            color: #4A6C6F;
+            border-bottom-color: #4A6C6F;
+            font-weight: 700;
+        }
+        .interactive-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .interactive-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="bg-[#F8F7F4]">
+
+    <header class="text-center py-8 bg-[#4A6C6F] text-white">
+        <h1 class="text-4xl md:text-5xl font-bold">5分で予習☆生物基礎</h1>
+        <p class="text-xl md:text-2xl mt-2">第4章 植生と遷移</p>
+    </header>
+
+    <nav id="navbar" class="sticky top-0 bg-[#F8F7F4]/90 backdrop-blur-md z-50 shadow-md">
+        <div class="container mx-auto px-4">
+            <ul class="flex justify-between md:justify-center items-center md:space-x-8 py-3 text-xs sm:text-sm md:text-base overflow-x-auto">
+                <li><a href="#hour1" class="nav-link p-2">1. 植生の分類</a></li>
+                <li><a href="#hour2" class="nav-link p-2">2. 光と植物の適応</a></li>
+                <li><a href="#hour3" class="nav-link p-2">3. 植物の遷移</a></li>
+                <li><a href="#hour4" class="nav-link p-2">4. バイオームの分類</a></li>
+                <li><a href="#hour5" class="nav-link p-2">5. 日本のバイオーム</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <section id="hour1" class="min-h-screen py-16">
+            <h2 class="text-3xl font-bold text-[#4A6C6F] border-b-4 border-[#DAB88F] pb-2 mb-8">1時間目：植生の分類</h2>
+            <div class="space-y-12">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">1. 植生と相観</h3>
+                    <p class="text-lg leading-relaxed mb-6">ある場所に生えている植物全体の集まりを<strong class="text-[#4A6C6F]">植生（しょくせい）</strong>と呼びます。その中で、個体数が多く、生活空間を最も広く占めている種を<strong class="text-[#4A6C6F]">優占種（ゆうせんしゅ）</strong>と呼びます。植生の見た目のようす（顔つき）は<strong class="text-[#4A6C6F]">相観（そうかん）</strong>といい、主に3タイプに分けられます。下のカードをクリックして、それぞれの特徴を見てみましょう。</p>
+                    <div class="grid md:grid-cols-3 gap-6 text-center">
+                        <div class="interactive-card bg-white p-6 rounded-xl shadow-lg cursor-pointer" onclick="showInfo('森林', '木々が密に生い茂る場所。背の高い木が優占種となることが多いです。')">
+                            <span class="text-5xl">🌳</span>
+                            <h4 class="text-xl font-bold mt-4">森林</h4>
+                        </div>
+                        <div class="interactive-card bg-white p-6 rounded-xl shadow-lg cursor-pointer" onclick="showInfo('草原', '主に草（草本植物）でおおわれている場所。ススキなどが優占種になります。')">
+                            <span class="text-5xl">🌾</span>
+                            <h4 class="text-xl font-bold mt-4">草原</h4>
+                        </div>
+                        <div class="interactive-card bg-white p-6 rounded-xl shadow-lg cursor-pointer" onclick="showInfo('荒原', '植物がまばらにしか生えていない場所。砂漠や高山の岩場などです。')">
+                            <span class="text-5xl">⛰️</span>
+                            <h4 class="text-xl font-bold mt-4">荒原</h4>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">2. 森林の階層構造</h3>
+                    <p class="text-lg leading-relaxed mb-6">森林の中は、植物の高さによっていくつかの層に分かれています。これを<strong class="text-[#4A6C6F]">階層構造</strong>と呼びます。太陽の光は、上の層にさえぎられるため、地面に近づくほど暗くなります。下の図の各層にマウスを乗せてみましょう。</p>
+                    <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col md:flex-row items-center justify-center gap-6">
+                        <div id="forest-layers" class="w-full md:w-1/2 space-y-1 text-center font-bold text-white">
+                            <div class="layer bg-sky-400 p-4 rounded-t-lg cursor-pointer" data-info="林冠: 森林の最上部。太陽光を最も強く受ける。">高木層</div>
+                            <div class="layer bg-sky-500 p-3 cursor-pointer" data-info="亜高木層: 高木の次に高い木の層。光はかなり遮られる。">亜高木層</div>
+                            <div class="layer bg-emerald-600 p-2 cursor-pointer" data-info="低木層: 背の低い木の層。林床はかなり暗くなる。">低木層</div>
+                            <div class="layer bg-emerald-700 p-1 cursor-pointer" data-info="草本層: 草が生える層。弱い光に適応した植物が多い。">草本層</div>
+                            <div class="layer bg-yellow-800 p-1 rounded-b-lg cursor-pointer" data-info="林床: 地面に近い部分。コケ植物などが生育する。">地表層</div>
+                        </div>
+                        <div id="layer-info" class="w-full md:w-1/2 h-32 bg-stone-100 rounded-lg p-4 flex items-center justify-center text-lg text-gray-700">
+                            各層にマウスを乗せると説明が表示されます。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="hour2" class="min-h-screen py-16">
+            <h2 class="text-3xl font-bold text-[#4A6C6F] border-b-4 border-[#DAB88F] pb-2 mb-8">2時間目：光と植物の適応</h2>
+            <div class="space-y-12">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">1. 光の強さと光合成速度</h3>
+                    <p class="text-lg leading-relaxed mb-6">植物は光の強さに応じて光合成の速度を変えます。日当たりの良い場所を好む<strong class="text-orange-500">陽生植物</strong>と、日陰でも生育できる<strong class="text-green-600">陰生植物</strong>では、その応答が異なります。グラフ中の重要な点を確認しましょう。<br>
+                    <strong class="text-blue-600">・光補償点:</strong> 見かけの光合成速度がゼロになる光の強さ。光合成によるCO₂吸収量と呼吸による放出量が等しい点です。<br>
+                    <strong class="text-red-600">・光飽和点:</strong> それ以上光を強くしても光合成速度が上がらなくなる点。陰生植物は陽生植物より低い光で飽和します。</p>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <div class="chart-container">
+                            <canvas id="photosynthesis-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">2. 陽葉と陰葉</h3>
+                    <p class="text-lg leading-relaxed mb-6">1本の木の中でも、光の当たり方によって葉の形や性質は変わります。日当たりの良い場所の葉を<strong class="text-orange-500">陽葉</strong>、日陰の葉を<strong class="text-green-600">陰葉</strong>と呼びます。</p>
+                     <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-orange-400">
+                            <h4 class="text-xl font-bold text-center mb-4 text-orange-500">陽葉 (Sun Leaf)</h4>
+                            <p class="text-center text-4xl mb-4">☀️</p>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>葉は厚く、小さい</li>
+                                <li>柵状組織がよく発達</li>
+                                <li>強い光のもとで高い光合成能力を発揮</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-green-500">
+                            <h4 class="text-xl font-bold text-center mb-4 text-green-600">陰葉 (Shade Leaf)</h4>
+                            <p class="text-center text-4xl mb-4">🍃</p>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>葉は薄く、広い</li>
+                                <li>弱い光を効率よく吸収</li>
+                                <li>光補償点・光飽和点が低い</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="hour3" class="min-h-screen py-16">
+            <h2 class="text-3xl font-bold text-[#4A6C6F] border-b-4 border-[#DAB88F] pb-2 mb-8">3時間目：植物の遷移</h2>
+            <div class="space-y-12">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">1. 一次遷移のプロセス</h3>
+                    <p class="text-lg leading-relaxed mb-6">ある場所の植生が時間と共に移り変わることを<strong class="text-[#4A6C6F]">遷移</strong>と言います。火山噴火でできた溶岩台地など、何もない場所から始まる<strong class="text-[#4A6C6F]">一次遷移</strong>の壮大なドラマを、ステップごとに見ていきましょう。</p>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <div class="relative h-64 mb-4 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                            <div id="succession-display" class="text-center"></div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <button id="prev-stage" class="bg-[#4A6C6F] text-white px-4 py-2 rounded-lg hover:bg-[#3b5658] transition-colors disabled:bg-gray-400">前へ</button>
+                            <span id="stage-name" class="font-bold text-xl text-[#4A6C6F]"></span>
+                            <button id="next-stage" class="bg-[#4A6C6F] text-white px-4 py-2 rounded-lg hover:bg-[#3b5658] transition-colors disabled:bg-gray-400">次へ</button>
+                        </div>
+                        <div id="stage-description" class="mt-4 text-center text-gray-700 p-4 bg-stone-100 rounded-lg"></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">2. 遷移の様々な種類</h3>
+                    <p class="text-lg leading-relaxed mb-6">遷移はその始まり方によっていくつかの種類に分けられます。</p>
+                    <div class="grid md:grid-cols-3 gap-6 text-center">
+                        <div class="interactive-card bg-white p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-bold mb-2">乾性遷移</h4>
+                            <p class="text-4xl mb-4">🏜️</p>
+                            <p>溶岩台地など、陸上の乾燥した裸地から始まる遷移。これまで見てきた一次遷移の典型例です。</p>
+                        </div>
+                        <div class="interactive-card bg-white p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-bold mb-2">湿性遷移</h4>
+                            <p class="text-4xl mb-4">💧</p>
+                            <p>湖や沼など、水中から始まる遷移。土砂や枯れた植物が堆積し、湿原から草原、そして森林へと変化します。</p>
+                        </div>
+                        <div class="interactive-card bg-white p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-bold mb-2">二次遷移</h4>
+                            <p class="text-4xl mb-4">🔥</p>
+                            <p>山火事や伐採の跡地など、土壌や種子が残った場所から始まる遷移。一次遷移より進行が非常に速いのが特徴です。</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">3. 遷移と環境の変化：伊豆大島の例</h3>
+                    <p class="text-lg leading-relaxed mb-6">遷移が進むにつれて、環境はどのように変化するのでしょうか？伊豆大島の火山噴火後の調査データから、植生の高さ、地表の明るさ、土壌の変化を見てみましょう。凡例をクリックすると、グラフの表示/非表示を切り替えられます。</p>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <div class="chart-container">
+                            <canvas id="izu-oshima-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">4. ギャップによる森林の更新</h3>
+                    <p class="text-lg leading-relaxed mb-6">遷移のゴールである<strong class="text-[#4A6C6F]">極相林</strong>も、実は静的な森ではありません。台風や寿命で木が倒れると、森の天井に<strong class="text-[#4A6C6F]">ギャップ</strong>と呼ばれる光の当たる空間ができ、次の世代の森の姿を決めます。</p>
+                    <div class="grid md:grid-cols-2 gap-8 text-center">
+                        <div class="interactive-card bg-white p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-bold mb-2">小さなギャップ</h4>
+                            <p class="text-4xl mb-4">🌤️</p>
+                            <p>林床まで届く光は弱いまま。日陰に強い<strong class="text-blue-600">陰樹</strong>の幼木がゆっくり成長し、再びギャップを埋めます。</p>
+                        </div>
+                        <div class="interactive-card bg-white p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-bold mb-2">大きなギャップ</h4>
+                            <p class="text-4xl mb-4">☀️</p>
+                            <p>林床まで強い光が差し込みます。明るい場所を好む<strong class="text-orange-600">陽樹</strong>の種子が発芽し、一気に成長します。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="hour4" class="min-h-screen py-16">
+            <h2 class="text-3xl font-bold text-[#4A6C6F] border-b-4 border-[#DAB88F] pb-2 mb-8">4時間目：バイオームの分類</h2>
+            <div class="space-y-12">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">1. 気候とバイオームの関係</h3>
+                    <p class="text-lg leading-relaxed mb-6">その地域の気候に対応して成立する生物の集まりを<strong class="text-[#4A6C6F]">バイオーム</strong>と呼びます。バイオームの分布は、主に<strong class="text-red-500">年平均気温</strong>と<strong class="text-blue-500">年降水量</strong>によって決まります。下のグラフで、様々なバイオームがどのような気候の場所に分布するのか探ってみましょう。</p>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <div class="chart-container">
+                            <canvas id="biome-chart"></canvas>
+                        </div>
+                        <div class="flex flex-wrap justify-center gap-2 mt-4">
+                            <button class="biome-btn bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-full text-sm" data-biome="熱帯多雨林">熱帯多雨林</button>
+                            <button class="biome-btn bg-lime-600 hover:bg-lime-700 text-white px-3 py-1 rounded-full text-sm" data-biome="亜熱帯多雨林">亜熱帯多雨林</button>
+                            <button class="biome-btn bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-full text-sm" data-biome="夏緑樹林">夏緑樹林</button>
+                            <button class="biome-btn bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-full text-sm" data-biome="照葉樹林">照葉樹林</button>
+                            <button class="biome-btn bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1 rounded-full text-sm" data-biome="針葉樹林">針葉樹林</button>
+                            <button class="biome-btn bg-amber-700 hover:bg-amber-800 text-white px-3 py-1 rounded-full text-sm" data-biome="サバンナ">サバンナ</button>
+                            <button class="biome-btn bg-pink-500 hover:bg-pink-600 text-white px-3 py-1 rounded-full text-sm" data-biome="ステップ">ステップ</button>
+                            <button class="biome-btn bg-stone-500 hover:bg-stone-600 text-white px-3 py-1 rounded-full text-sm" data-biome="砂漠">砂漠</button>
+                            <button class="biome-btn bg-sky-700 hover:bg-sky-800 text-white px-3 py-1 rounded-full text-sm" data-biome="ツンドラ">ツンドラ</button>
+                        </div>
+                        <div id="biome-info" class="mt-6 p-4 bg-stone-100 rounded-lg hidden">
+                            <h4 id="biome-info-title" class="text-xl font-bold text-[#4A6C6F]"></h4>
+                            <p id="biome-info-text" class="mt-2"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="hour5" class="min-h-screen py-16">
+            <h2 class="text-3xl font-bold text-[#4A6C6F] border-b-4 border-[#DAB88F] pb-2 mb-8">5時間目：日本のバイオーム</h2>
+            <div class="space-y-12">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">1. 日本の水平分布と垂直分布</h3>
+                    <p class="text-lg leading-relaxed mb-6">日本のバイオームは、緯度や標高によって変化します。<strong class="text-[#4A6C6F]">水平分布</strong>は緯度の違い（北から南へ）による変化、<strong class="text-[#4A6C6F]">垂直分布</strong>は標高の違い（麓から山頂へ）による変化を示します。</p>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-bold text-center mb-4">水平分布 (北→南)</h4>
+                            <div class="space-y-2">
+                                <div class="bg-cyan-200 p-3 rounded-lg text-center font-bold">針葉樹林</div>
+                                <div class="text-center">↓</div>
+                                <div class="bg-yellow-200 p-3 rounded-lg text-center font-bold">夏緑樹林</div>
+                                <div class="text-center">↓</div>
+                                <div class="bg-orange-200 p-3 rounded-lg text-center font-bold">照葉樹林</div>
+                                <div class="text-center">↓</div>
+                                <div class="bg-red-200 p-3 rounded-lg text-center font-bold">亜熱帯多雨林</div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                             <h4 class="text-xl font-bold text-center mb-4">垂直分布 (本州中部)</h4>
+                            <div class="relative w-full max-w-lg mx-auto" style="height: 250px;">
+                                <div class="absolute bottom-0 w-full h-[20%] bg-orange-300 rounded-t-lg flex items-center justify-center font-bold">丘陵帯 (照葉樹林)</div>
+                                <div class="absolute bottom-[20%] w-full h-[30%] bg-yellow-300 flex items-center justify-center font-bold">山地帯 (夏緑樹林)</div>
+                                <div class="absolute bottom-[50%] w-full h-[30%] bg-cyan-400 flex items-center justify-center font-bold">亜高山帯 (針葉樹林)</div>
+                                <div class="absolute bottom-[80%] w-full h-[5%] bg-gray-500 flex items-center justify-center text-white text-sm">森林限界</div>
+                                <div class="absolute bottom-[85%] w-full h-[15%] bg-sky-300 rounded-t-lg flex items-center justify-center font-bold">高山帯</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div>
+                    <h3 class="text-2xl font-bold mb-4">2. データ探究：暖かさの指数</h3>
+                    <p class="text-lg leading-relaxed mb-6">気温とバイオームの関係を示す指標として、<strong class="text-[#4A6C6F]">暖かさの指数</strong>があります。これは、植物の生育期間の暖かさを数値化したもので、日本のバイオームの分布とよく対応します。</p>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h4 class="text-xl font-bold mb-2">計算方法</h4>
+                        <p class="mb-4">月平均気温が5℃を超える月について、「月平均気温 - 5」を計算し、1年分を合計します。</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-stone-100">
+                                    <tr>
+                                        <th class="p-2 border">暖かさの指数</th>
+                                        <th class="p-2 border">対応するバイオーム</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td class="p-2 border">180以上</td><td class="p-2 border">亜熱帯多雨林</td></tr>
+                                    <tr><td class="p-2 border">85～180</td><td class="p-2 border">照葉樹林</td></tr>
+                                    <tr><td class="p-2 border">45～85</td><td class="p-2 border">夏緑樹林</td></tr>
+                                    <tr><td class="p-2 border">15～45</td><td class="p-2 border">針葉樹林</td></tr>
+                                    <tr><td class="p-2 border">15以下</td><td class="p-2 border">ツンドラ (森林は成立しない)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                 <div>
+                    <h3 class="text-2xl font-bold mb-4">3. データ探究：気候と植生</h3>
+                    <p class="text-lg leading-relaxed mb-6">年平均気温や年降水量が似ていても、季節ごとのパターンが異なると、成立するバイオームも変わります。カナダの<strong class="text-purple-600">バンクーバー（硬葉樹林）</strong>と日本の<strong class="text-teal-600">函館（夏緑樹林）</strong>の気候グラフを比べてみましょう。</p>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-bold text-center mb-2 text-purple-600">バンクーバー</h4>
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="vancouver-chart"></canvas>
+                            </div>
+                            <p class="mt-4 text-center">夏に乾燥し、冬に雨が多い地中海性気候。乾燥する夏に適応した硬い葉を持つ<strong class="text-purple-600">硬葉樹林</strong>が発達。</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-bold text-center mb-2 text-teal-600">函館</h4>
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="hakodate-chart"></canvas>
+                            </div>
+                            <p class="mt-4 text-center">夏は温暖で雨も多く、冬は寒さが厳しい。光合成ができない冬に葉を落とす<strong class="text-teal-600">夏緑樹林</strong>が発達。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            <h3 id="modal-title" class="text-2xl font-bold text-[#4A6C6F] mb-4"></h3>
+            <p id="modal-text" class="text-lg"></p>
+        </div>
+    </div>
+
+    <footer class="text-center py-6 bg-[#3A3A3A] text-white mt-16">
+        <p>&copy; 2025 Interactive Biology Learning. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '-60px 0px 0px 0px', // Adjust for sticky nav height
+                threshold: 0.4
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            navLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if(targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            initHour1();
+            initHour2();
+            initHour3();
+            initHour4();
+            initHour5();
+        });
+
+        function showInfo(title, text) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-text').innerText = text;
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        function initHour1() {
+            const layers = document.querySelectorAll('.layer');
+            const infoBox = document.getElementById('layer-info');
+            layers.forEach(layer => {
+                layer.addEventListener('mouseenter', () => {
+                    infoBox.textContent = layer.dataset.info;
+                });
+            });
+        }
+        
+        function initHour2() {
+            const ctx = document.getElementById('photosynthesis-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['0', '弱い', '中程度', '強い', '非常に強い'],
+                    datasets: [
+                        {
+                            label: '陽生植物',
+                            data: [ -5, 5, 20, 25, 25],
+                            borderColor: 'rgba(249, 115, 22, 1)',
+                            backgroundColor: 'rgba(249, 115, 22, 0.2)',
+                            tension: 0.4,
+                            fill: false
+                        },
+                        {
+                            label: '陰生植物',
+                            data: [-2, 5, 8, 8, 8],
+                            borderColor: 'rgba(22, 163, 74, 1)',
+                            backgroundColor: 'rgba(22, 163, 74, 0.2)',
+                            tension: 0.4,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: '光の強さ' }
+                        },
+                        y: {
+                            title: { display: true, text: '見かけの光合成速度（CO2吸収速度）' },
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    if (value === 0) return '0 (光補償点)';
+                                    return value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: { display: true, text: '陽生植物と陰生植物の光合成曲線の比較' },
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function initHour3() {
+            const stages = [
+                { name: '裸地', description: '溶岩などで覆われ、土壌も生物もいない状態。先駆種である地衣類やコケ類が定着し始める。', content: '⛰️' },
+                { name: '草原', description: '先駆種の働きで土壌が形成され、ススキなどの草本が侵入し草原となる。', content: '🌾' },
+                { name: '低木林', description: '土壌がさらに発達し、陽樹の低い木が侵入して低木林を形成する。', content: '🌳' },
+                { name: '陽樹林', description: '陽樹が成長し、森林を形成。林床は暗くなり始める。', content: '🌲<sub class="text-xs">陽</sub>' },
+                { name: '混交林', description: '暗い林床で陰樹が育ち始め、陽樹と陰樹が混ざった混交林となる。', content: '🌲<sub class="text-xs">陽</sub>🌳<sub class="text-xs">陰</sub>' },
+                { name: '極相林', description: '陽樹が寿命で枯れ、陰樹が優占する安定した極相林（クライマックス）に達する。', content: '🌳<sub class="text-xs">陰</sub>🌳<sub class="text-xs">陰</sub>' }
+            ];
+            let currentStage = 0;
+
+            const display = document.getElementById('succession-display');
+            const stageName = document.getElementById('stage-name');
+            const stageDesc = document.getElementById('stage-description');
+            const prevBtn = document.getElementById('prev-stage');
+            const nextBtn = document.getElementById('next-stage');
+
+            function updateStage() {
+                display.innerHTML = `<div class="text-6xl">${stages[currentStage].content}</div>`;
+                stageName.textContent = stages[currentStage].name;
+                stageDesc.textContent = stages[currentStage].description;
+                prevBtn.disabled = currentStage === 0;
+                nextBtn.disabled = currentStage === stages.length - 1;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentStage < stages.length - 1) {
+                    currentStage++;
+                    updateStage();
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentStage > 0) {
+                    currentStage--;
+                    updateStage();
+                }
+            });
+
+            updateStage();
+
+            const izuOshimaData = {
+                labels: ['荒原', '低木林', '混交林', '陰樹林'],
+                datasets: [
+                    {
+                        label: '植生の高さ (m)',
+                        data: [0.6, 2.8, 9.2, 12.5],
+                        borderColor: '#4A6C6F',
+                        backgroundColor: '#4A6C6F',
+                        yAxisID: 'y',
+                        tension: 0.1
+                    },
+                    {
+                        label: '地表の照度 (%)',
+                        data: [90, 23, 2.7, 1.8],
+                        borderColor: '#DAB88F',
+                        backgroundColor: '#DAB88F',
+                        yAxisID: 'y1',
+                        tension: 0.1
+                    },
+                    {
+                        label: '土壌の厚さ (cm)',
+                        data: [0.1, 0.8, 40, 37],
+                        borderColor: '#A5C4D4',
+                        backgroundColor: '#A5C4D4',
+                        yAxisID: 'y1',
+                        tension: 0.1,
+                        hidden: true
+                    },
+                    {
+                        label: '土壌中の有機物量 (%)',
+                        data: [0.3, 6.4, 20, 31],
+                        borderColor: '#88a0a8',
+                        backgroundColor: '#88a0a8',
+                        yAxisID: 'y1',
+                        tension: 0.1,
+                        hidden: true
+                    }
+                ]
+            };
+            new Chart(document.getElementById('izu-oshima-chart'), {
+                type: 'line',
+                data: izuOshimaData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: '植生の高さ (m)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: '割合 / 厚さ (%) , (cm)' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    },
+                    plugins: {
+                        title: { display: true, text: '伊豆大島における遷移に伴う環境変化' },
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        function initHour4() {
+            const biomeData = {
+                '熱帯多雨林': { temp: 27, precip: 2500, color: 'rgba(22, 163, 74, 0.7)', desc: '年中高温多雨。生物多様性が最も高い。ジャングル。' },
+                '亜熱帯多雨林': { temp: 22, precip: 2000, color: 'rgba(74, 222, 128, 0.7)', desc: '熱帯よりは気温の年較差があるが、温暖で多雨。ガジュマルなど。' },
+                '夏緑樹林': { temp: 10, precip: 1200, color: 'rgba(234, 179, 8, 0.7)', desc: '冬は寒く、葉を落とす落葉広葉樹（ブナ、ミズナラ）の森。' },
+                '照葉樹林': { temp: 15, precip: 1800, color: 'rgba(249, 115, 22, 0.7)', desc: '冬も温暖で、硬く光沢のある葉を持つ常緑広葉樹（シイ、カシ）の森。' },
+                '針葉樹林': { temp: 0, precip: 500, color: 'rgba(6, 182, 212, 0.7)', desc: '冬が長く寒さが厳しい亜寒帯に分布。モミ、トウヒなど。' },
+                'サバンナ': { temp: 25, precip: 900, color: 'rgba(217, 119, 6, 0.7)', desc: '熱帯で雨季と乾季がある。イネ科の草原に樹木が点在。' },
+                'ステップ': { temp: 8, precip: 400, color: 'rgba(236, 72, 153, 0.7)', desc: '温帯の乾燥地域に広がる草原。樹木はほとんどない。' },
+                '砂漠': { temp: 23, precip: 100, color: 'rgba(113, 113, 122, 0.7)', desc: '降水量が極端に少ない。サボテンなど多肉植物が見られる。' },
+                'ツンドラ': { temp: -10, precip: 250, color: 'rgba(14, 116, 144, 0.7)', desc: '極寒の地。永久凍土が広がり、コケ植物や地衣類が主。' },
+            };
+
+            const biomePoints = Object.keys(biomeData).map(key => ({
+                x: biomeData[key].temp,
+                y: biomeData[key].precip,
+                label: key,
+                backgroundColor: biomeData[key].color
+            }));
+
+            new Chart(document.getElementById('biome-chart'), {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '代表的なバイオーム',
+                        data: biomePoints,
+                        pointRadius: 8,
+                        pointHoverRadius: 12,
+                        backgroundColor: biomePoints.map(p => p.backgroundColor)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: '年平均気温 (°C)' },
+                            min: -15, max: 30
+                        },
+                        y: {
+                            title: { display: true, text: '年降水量 (mm)' },
+                            min: 0, max: 4500
+                        }
+                    },
+                    plugins: {
+                        title: { display: true, text: '世界のバイオームと気候の関係' },
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw.label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const biomeInfoBox = document.getElementById('biome-info');
+            const biomeInfoTitle = document.getElementById('biome-info-title');
+            const biomeInfoText = document.getElementById('biome-info-text');
+
+            document.querySelectorAll('.biome-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const biomeName = btn.dataset.biome;
+                    const data = biomeData[biomeName];
+                    if (data) {
+                        biomeInfoTitle.textContent = biomeName;
+                        biomeInfoText.textContent = data.desc;
+                        biomeInfoBox.classList.remove('hidden');
+                    }
+                });
+            });
+        }
+
+        function initHour5() {
+            const vancouverData = {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                datasets: [
+                    { type: 'bar', label: '降水量 (mm)', data: [163, 110, 115, 93, 75, 57, 41, 37, 48, 109, 194, 157], backgroundColor: 'rgba(167, 139, 250, 0.6)', yAxisID: 'y1' },
+                    { type: 'line', label: '平均気温 (°C)', data: [4.0, 4.8, 7.0, 9.4, 12.7, 15.5, 17.6, 17.9, 14.9, 10.2, 6.3, 3.4], borderColor: 'rgb(139, 92, 246)', tension: 0.1, yAxisID: 'y' }
+                ]
+            };
+            const hakodateData = {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                datasets: [
+                    { type: 'bar', label: '降水量 (mm)', data: [77, 59, 59, 70, 84, 73, 130, 154, 153, 100, 108, 85], backgroundColor: 'rgba(45, 212, 191, 0.6)', yAxisID: 'y1' },
+                    { type: 'line', label: '平均気温 (°C)', data: [-2.6, -2.1, 1.4, 7.2, 11.9, 15.8, 19.7, 22.0, 18.3, 12.2, 5.7, 0.0], borderColor: 'rgb(13, 148, 136)', tension: 0.1, yAxisID: 'y' }
+                ]
+            };
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { min: -10, max: 30, title: { display: true, text: '気温 (°C)' } },
+                    y1: { type: 'linear', display: true, position: 'right', min: 0, max: 250, title: { display: true, text: '降水量 (mm)' }, grid: { drawOnChartArea: false } }
+                },
+                plugins: { legend: { display: false } }
+            };
+            new Chart(document.getElementById('vancouver-chart'), { data: vancouverData, options: commonOptions });
+            new Chart(document.getElementById('hakodate-chart'), { data: hakodateData, options: commonOptions });
+        }
+
+    </script>
+</body>
+</html>
